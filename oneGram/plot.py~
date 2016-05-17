@@ -1,0 +1,54 @@
+import plotly;
+plotly.tools.set_credentials_file(username='vamsikrishna.angajala', api_key='sk1n9hooza')
+
+import plotly.plotly as py
+import plotly.graph_objs as go
+
+ #Plotting the heat map
+  totalPerYear = topFreqPerYear.map(lambda (k,v): (int(k.split()[1]), int(v))).reduceByKey(lambda a,b : a+b).collectAsMap()
+  data = topFreqPerYear.map(lambda (k,v): (str(k.split()[0]), int(k.split()[1]), int(int(v)*1000/totalPerYear[int(k.split()[1])])))
+  xaxis = data.map(lambda (a,b,c): b).distinct()
+  yaxis = data.map(lambda (a,b,c): a).distinct()
+  zaxis = data.map(lambda (a,b,c): (b, c)).groupByKey().mapValues(list).map(lambda x: x[1]).collect()
+  
+  data = [
+    go.Heatmap(
+        z= zaxis,
+           x= xaxis,
+        y= yaxis
+    )
+  ]
+  plot_url = py.plot(data, filename='heatmapFor1gram')
+  
+from __future__ import print_function
+import sys, json
+from pyspark import SparkContext
+
+import plotly;
+plotly.tools.set_credentials_file(username='vamsikrishna.angajala', api_key='sk1n9hooza')
+
+import plotly.plotly as py
+import plotly.graph_objs as go
+
+sc = SparkContext(appName="plotting")
+
+#Plotting the heat map
+topFreqPerYear = sc.textFile("hdfs://hadoop2-0-0/user/angajava/vamsi_top25WordFrequencies1/part-00000").map(lambda x:x.strip("()',").split())
+totalPerYear = topFreqPerYear.map(lambda x: (int(x[1].replace("'","").strip(",")), int(x[2]))).reduceByKey(lambda a,b : a+b).collectAsMap()
+data = topFreqPerYear.map(lambda x: (str(x[0]), int(x[1].strip("()',")), int(int(x[2])*1000/totalPerYear[int(x[1].strip("()',"))])))
+
+
+xaxis = data.map(lambda x: x[1]).distinct().collect()
+yaxis = data.map(lambda x: x[0]).distinct().collect()
+
+zaxis = data.map(lambda x: (x[1], x[2])).groupByKey().mapValues(list).map(lambda x: x[1]).collect()
+  
+data = [
+    go.Heatmap(
+        z= zaxis,
+           x= xaxis,
+        y= yaxis
+    )
+  ]
+plot_url = py.plot(data, filename='heatmapFor1gram')
+
