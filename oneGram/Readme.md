@@ -16,5 +16,5 @@ To run on cluster:
 
 `spark-submit --master yarn-client plot.py`
 
-Note: Be sure the outputfile (top25Frequencies) does not exit in your HDFS home folder, before running the commands.
+Note: Make sure the outputfile (top25Frequencies) does not exist in your HDFS home folder, before running the commands.
 
