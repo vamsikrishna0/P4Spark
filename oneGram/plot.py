@@ -12,8 +12,7 @@ sc = SparkContext(appName="plotting")
 
 #Plotting the heat map
 topFreqPerYear = sc.textFile("hdfs://hadoop2-0-0/user/angajava/top25WordFrequencies/part-00000").map(lambda x:x.split())
-#topFreqPerYear = sc.textFile("C:/Users/Vamsi/Downloads/softwares/spark_examples-master/spark_examples-master/oneGram/dataForHeatMap").map(lambda x:x.split())
-C:/Users/Vamsi/Downloads/softwares/spark_examples-master/dataForHeatMap
+
 totalPerYear = topFreqPerYear.map(lambda x: (int(x[1]), int(x[2]))).reduceByKey(lambda a,b : a+b).collectAsMap()
 dataMap=topFreqPerYear.map(lambda x: (str(x[0]), int(x[1]), int(int(x[2])*1000/totalPerYear[int(x[1])])))
 
